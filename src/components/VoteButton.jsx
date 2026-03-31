@@ -15,9 +15,9 @@ export default function VoteButton({ votes, isVoted, onClick, disabled }) {
       } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
     >
       <ChevronUp className={`w-6 h-6 -mb-1 transition-transform ${isVoted ? 'text-accent-gold translate-y-[-2px]' : ''}`} />
-      <div className="relative h-5 overflow-hidden flex items-center justify-center">
+      <div className="relative h-5 w-full overflow-hidden flex items-center justify-center">
         <AnimatePresence mode="popLayout" initial={false}>
-          <motion.span 
+          <motion.div 
             key={votes}
             initial={{ opacity: 0, y: isVoted ? 15 : -15 }} 
             animate={{ opacity: 1, y: 0 }}
@@ -26,7 +26,7 @@ export default function VoteButton({ votes, isVoted, onClick, disabled }) {
             className="font-bold text-sm tracking-tight absolute inset-0 flex items-center justify-center"
           >
             {votes}
-          </motion.span>
+          </motion.div>
         </AnimatePresence>
       </div>
     </motion.button>
