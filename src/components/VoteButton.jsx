@@ -1,5 +1,4 @@
-"use client";
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronUp } from 'lucide-react';
 
 export default function VoteButton({ votes, isVoted, onClick, disabled }) {
@@ -16,14 +15,20 @@ export default function VoteButton({ votes, isVoted, onClick, disabled }) {
       } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
     >
       <ChevronUp className={`w-6 h-6 -mb-1 transition-transform ${isVoted ? 'text-accent-gold translate-y-[-2px]' : ''}`} />
-      <motion.span 
-        key={votes}
-        initial={{ opacity: 0, y: -5 }} 
-        animate={{ opacity: 1, y: 0 }}
-        className="font-bold text-sm tracking-tight"
-      >
-        {votes}
-      </motion.span>
+      <div className="relative h-5 overflow-hidden flex items-center justify-center">
+        <AnimatePresence mode="popLayout" initial={false}>
+          <motion.span 
+            key={votes}
+            initial={{ opacity: 0, y: isVoted ? 15 : -15 }} 
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: isVoted ? -15 : 15, transition: { duration: 0.15 } }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="font-bold text-sm tracking-tight absolute inset-0 flex items-center justify-center"
+          >
+            {votes}
+          </motion.span>
+        </AnimatePresence>
+      </div>
     </motion.button>
   );
 }

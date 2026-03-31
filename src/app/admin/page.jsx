@@ -6,13 +6,14 @@ import { useAuth } from '../../context/AuthContext';
 import { useStudents } from '../../hooks/useStudents';
 import { supabase } from '../../lib/supabase';
 import { useToast } from '../../context/ToastContext';
-import { Shield, Check, X, Loader2, AlertCircle } from 'lucide-react';
+import { Shield, Check, X, Loader2, ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AdminInbox() {
   const { user, isAdmin, loading: authLoading } = useAuth();
-  const { students: pendingStudents, loading: studentsLoading, fetchStudents } = useStudents('pending');
+  const { students: pendingStudents, loading: studentsLoading, fetchStudents, setStudents } = useStudents('pending');
   const router = useRouter();
   const { addToast } = useToast();
 
@@ -33,8 +34,9 @@ export default function AdminInbox() {
         
       if (error) throw error;
       
+      // Optimistic UI for Framer exit animation
+      setStudents(prev => prev.filter(s => s.id !== studentId));
       addToast(`Student ${status} successfully`, 'success');
-      // The realtime subscription in useStudents will automatically remove them from the list
     } catch (error) {
       addToast(error.message || 'Failed to update student', 'error');
     }
@@ -56,6 +58,9 @@ export default function AdminInbox() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-accent-gold/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
         
         <div className="flex items-center gap-4 mb-4">
+          <Link href="/" className="mr-2 p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors hidden sm:flex">
+            <ArrowLeft className="w-5 h-5 text-muted hover:text-white" />
+          </Link>
           <div className="w-12 h-12 rounded-xl bg-accent-gold/20 flex items-center justify-center border border-accent-gold/30">
             <Shield className="w-6 h-6 text-accent-gold" />
           </div>
@@ -64,7 +69,7 @@ export default function AdminInbox() {
           </h1>
         </div>
         
-        <p className="text-muted text-lg max-w-2xl leading-relaxed">
+        <p className="text-muted text-lg max-w-2xl leading-relaxed sm:ml-[4.5rem]">
           Review new student submissions before they appear on the public leaderboard. 
           Approving a student instantly shares them with the community.
         </p>
@@ -88,14 +93,14 @@ export default function AdminInbox() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <AnimatePresence>
+            <AnimatePresence mode="popLayout">
               {pendingStudents.map((student) => (
                 <motion.div
-                  key={student.id}
                   layout
+                  key={student.id}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95, filter: 'blur(4px)' }}
+                  exit={{ opacity: 0, scale: 0.95, filter: 'blur(4px)', y: 20 }}
                   className="glass-panel p-6 rounded-2xl flex flex-col sm:flex-row gap-6 border border-white/10 group hover:border-white/20 transition-all"
                 >
                   <div className="relative w-full sm:w-28 h-40 sm:h-28 rounded-xl overflow-hidden bg-black/50 shrink-0">

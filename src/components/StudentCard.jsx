@@ -1,6 +1,7 @@
 "use client";
 import { motion } from 'framer-motion';
 import { Camera, Crown, Trash2 } from 'lucide-react';
+import Image from 'next/image';
 import VoteButton from './VoteButton';
 import { useAuth } from '../context/AuthContext';
 
@@ -44,12 +45,13 @@ export default function StudentCard({ student, rank, onVote, isVoted, onDelete }
             <Crown size={28} />
           </div>
         )}
-        <div className={`w-full h-full rounded-full p-1 ${isTop3 ? 'bg-gradient-to-tr from-white/20 to-white/5' : 'bg-white/5'}`}>
-          <img 
-            src={student.photo_url} 
+        <div className={`w-full h-full rounded-full p-1 ${isTop3 ? 'bg-gradient-to-tr from-white/20 to-white/5' : 'bg-white/5'} relative`}>
+          <Image 
+            src={student.photo_url || '/placeholder.png'} 
             alt={student.name}
-            loading="lazy"
-            className="w-full h-full object-cover rounded-full bg-background"
+            fill
+            sizes="(max-width: 640px) 96px, 128px"
+            className="object-cover rounded-full bg-background"
           />
         </div>
       </div>

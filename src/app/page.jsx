@@ -10,7 +10,7 @@ import { supabase } from '../lib/supabase';
 import { useRouter } from 'next/navigation';
 
 export default function RankingPage() {
-  const { students, loading, fetchStudents } = useStudents();
+  const { students, loading, fetchStudents, setStudents } = useStudents();
   const { userVotes, hasVoted, setUserVotes } = useVotes();
   const { requireAuth, user } = useAuth();
   const { addToast } = useToast();
@@ -26,6 +26,13 @@ export default function RankingPage() {
     setUserVotes(newVotes);
 
     if (isVoted) {
+      setStudents(prev => {
+        return prev.map(s => {
+          if (s.id === studentId) return { ...s, votes: s.votes - 1 };
+          return s;
+        }).sort((a, b) => b.votes - a.votes);
+      });
+      
       const { error } = await supabase
         .from('votes')
         .delete()
@@ -34,11 +41,16 @@ export default function RankingPage() {
       if (error) {
         addToast(error.message, 'error');
         setUserVotes(userVotes); // revert
-      } else {
-        // Optimistic cache mutation for snappy counter feel
-        // The realtime subscription will eventually true this up
+        fetchStudents(); // revert ranking
       }
     } else {
+      setStudents(prev => {
+        return prev.map(s => {
+          if (s.id === studentId) return { ...s, votes: s.votes + 1 };
+          return s;
+        }).sort((a, b) => b.votes - a.votes);
+      });
+      
       const { error } = await supabase
         .from('votes')
         .insert({ student_id: studentId, user_id: user.id });
@@ -46,6 +58,7 @@ export default function RankingPage() {
       if (error) {
         addToast(error.message, 'error');
         setUserVotes(userVotes); // revert
+        fetchStudents(); // revert ranking
       }
     }
   };

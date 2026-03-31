@@ -42,5 +42,5 @@ export function useStudents(status = 'approved') {
     setLoading(false);
   };
 
-  return { students, loading, fetchStudents };
+  return { students, loading, fetchStudents, setStudents };
 }
