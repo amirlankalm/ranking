@@ -66,7 +66,11 @@ export default function AddPage() {
 
       const { error: uploadError } = await supabase.storage
         .from('student-photos')
-        .upload(filePath, photo);
+        .upload(filePath, photo, {
+          contentType: photo.type,
+          cacheControl: '3600',
+          upsert: false
+        });
 
       if (uploadError) throw uploadError;
 
@@ -194,6 +198,9 @@ export default function AddPage() {
               <input
                 type="text"
                 required
+                maxLength={40}
+                pattern="^[A-Za-z\s\-]+$"
+                title="Only letters, spaces, and hyphens are allowed."
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="E.g., Alisher Nurgaliyev"
@@ -207,8 +214,11 @@ export default function AddPage() {
                 <input
                   type="text"
                   required
+                  maxLength={5}
+                  pattern="^[0-9]{1,2}[A-Za-z]$"
+                  title="Format: Number followed by a letter (e.g. 11A, 9B)"
                   value={studentClass}
-                  onChange={(e) => setStudentClass(e.target.value)}
+                  onChange={(e) => setStudentClass(e.target.value.toUpperCase())}
                   placeholder="11A"
                   className="w-full bg-background/50 border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-accent-gold focus:ring-1 focus:ring-accent-gold transition-all placeholder:text-muted/40 uppercase"
                 />
@@ -221,8 +231,11 @@ export default function AddPage() {
                   <input
                     type="text"
                     required
+                    maxLength={30}
+                    pattern="^[A-Za-z0-9_.]+$"
+                    title="Instagram usernames can only contain letters, numbers, periods, and underscores."
                     value={instagram}
-                    onChange={(e) => setInstagram(e.target.value)}
+                    onChange={(e) => setInstagram(e.target.value.replace('@', ''))}
                     placeholder="username"
                     className="w-full bg-background/50 border border-white/10 rounded-xl pl-9 pr-4 py-3.5 text-white focus:outline-none focus:border-accent-gold focus:ring-1 focus:ring-accent-gold transition-all placeholder:text-muted/40"
                   />
